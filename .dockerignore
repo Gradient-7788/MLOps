@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.git/
+.venv/
+data_store/
+models_store/
+experiments_store/
+monitoring_store/

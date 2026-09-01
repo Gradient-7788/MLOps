@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production MLOps Platform | Automated Model Pipeline</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81'
+                        },
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .pipeline-arrow::after {
+            content: '↓';
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #6366f1;
+            display: block;
+            text-align: center;
+            margin: 4px 0;
+        }
+        .scroll-custom::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scroll-custom::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen">
+
+    <!-- Top Navigation Header -->
+    <header class="glass-card sticky top-0 z-50 border-b border-slate-700/60 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-brand-500/30">
+                <i class="fa-solid fa-diagram-project"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                    Production MLOps Platform
+                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">v1.0 ACTIVE</span>
+                </h1>
+                <p class="text-xs text-slate-400">Automated Training, HPO, Registry, Monitoring, Drift Detection & Self-Healing Retraining</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <button onclick="triggerDriftSimulation()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition flex items-center gap-2">
+                <i class="fa-solid fa-flask-vial"></i> Inject Data Drift
+            </button>
+            <button onclick="triggerAutoRetrain()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 text-white hover:from-brand-500 hover:to-indigo-500 shadow-md shadow-brand-600/30 transition flex items-center gap-2">
+                <i class="fa-solid fa-arrows-rotate"></i> Auto Retrain Pipeline
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+        <!-- 13-STEP PIPELINE ARCHITECTURE FLOW DIAGRAM -->
+        <section class="glass-card rounded-2xl p-6 shadow-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-network-wired text-brand-500"></i> End-to-End Pipeline Architecture (13 Stages)
+                </h2>
+                <span class="text-xs text-slate-400">All components operational</span>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-center">
+                <!-- Step 1 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-brand-400 text-sm mb-1"><i class="fa-solid fa-database"></i></div>
+                    <div class="text-xs font-bold text-slate-200">1. Data</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Ingest & Stream</div>
+                </div>
+                <!-- Step 2 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-emerald-400 text-sm mb-1"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="text-xs font-bold text-slate-200">2. Data Validation</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Schema & Range</div>
+                </div>
+                <!-- Step 3 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-cyan-400 text-sm mb-1"><i class="fa-solid fa-gears"></i></div>
+                    <div class="text-xs font-bold text-slate-200">3. Feature Pipeline</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Ratios & Scalers</div>
+                </div>
+                <!-- Step 4 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-purple-400 text-sm mb-1"><i class="fa-solid fa-brain"></i></div>
+                    <div class="text-xs font-bold text-slate-200">4. Training</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Ensembles</div>
+                </div>
+                <!-- Step 5 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-pink-400 text-sm mb-1"><i class="fa-solid fa-sliders"></i></div>
+                    <div class="text-xs font-bold text-slate-200">5. HPO</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Optuna Tuning</div>
+                </div>
+                <!-- Step 6 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-amber-400 text-sm mb-1"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="text-xs font-bold text-slate-200">6. Exp Tracking</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Metrics & Runs</div>
+                </div>
+                <!-- Step 7 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-indigo-400 text-sm mb-1"><i class="fa-solid fa-box-archive"></i></div>
+                    <div class="text-xs font-bold text-slate-200">7. Model Registry</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Stages & Staging</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-center mt-3">
+                <!-- Step 8 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-teal-400 text-sm mb-1"><i class="fa-solid fa-vial"></i></div>
+                    <div class="text-xs font-bold text-slate-200">8. Automated Tests</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Pytest Suite</div>
+                </div>
+                <!-- Step 9 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-blue-400 text-sm mb-1"><i class="fa-brands fa-docker"></i></div>
+                    <div class="text-xs font-bold text-slate-200">9. Docker</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Containerized</div>
+                </div>
+                <!-- Step 10 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-green-400 text-sm mb-1"><i class="fa-solid fa-server"></i></div>
+                    <div class="text-xs font-bold text-slate-200">10. API</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">FastAPI Server</div>
+                </div>
+                <!-- Step 11 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-rose-400 text-sm mb-1"><i class="fa-solid fa-gauge-high"></i></div>
+                    <div class="text-xs font-bold text-slate-200">11. Monitoring</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Latency & Logs</div>
+                </div>
+                <!-- Step 12 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-yellow-400 text-sm mb-1"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="text-xs font-bold text-slate-200">12. Drift Detection</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">PSI & KS-Test</div>
+                </div>
+                <!-- Step 13 -->
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-brand-500 transition">
+                    <div class="text-sky-400 text-sm mb-1"><i class="fa-solid fa-rotate"></i></div>
+                    <div class="text-xs font-bold text-slate-200">13. Auto Retraining</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Self-Healing</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOP STATS CARDS -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="glass-card rounded-xl p-5">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">Active Production Model</span>
+                    <i class="fa-solid fa-box text-brand-400"></i>
+                </div>
+                <div id="stat-prod-model" class="text-xl font-bold text-white">Loading...</div>
+                <div id="stat-prod-auc" class="text-xs text-emerald-400 mt-1">ROC-AUC: --</div>
+            </div>
+
+            <div class="glass-card rounded-xl p-5">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">Drift PSI Status</span>
+                    <i class="fa-solid fa-chart-area text-amber-400"></i>
+                </div>
+                <div id="stat-psi-val" class="text-xl font-bold text-white">0.02 (STABLE)</div>
+                <div id="stat-psi-desc" class="text-xs text-slate-400 mt-1">Threshold: 0.20</div>
+            </div>
+
+            <div class="glass-card rounded-xl p-5">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">Avg API Latency</span>
+                    <i class="fa-solid fa-bolt text-cyan-400"></i>
+                </div>
+                <div id="stat-latency" class="text-xl font-bold text-white">-- ms</div>
+                <div class="text-xs text-slate-400 mt-1">Target: < 50ms</div>
+            </div>
+
+            <div class="glass-card rounded-xl p-5">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-medium uppercase tracking-wider">Total Predictions</span>
+                    <i class="fa-solid fa-calculator text-purple-400"></i>
+                </div>
+                <div id="stat-total-preds" class="text-xl font-bold text-white">0</div>
+                <div id="stat-default-rate" class="text-xs text-slate-400 mt-1">Default Rate: --</div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD CONTENT GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- LEFT 2 COLS: Prediction Sandbox, Registry, & Drift visualizer -->
+            <div class="lg:col-span-2 space-y-8">
+
+                <!-- LIVE MODEL PREDICTION SANDBOX -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                    <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-microchip text-brand-500"></i> Real-Time Inference Playground
+                    </h2>
+
+                    <form id="prediction-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Credit Score (300 - 850)</label>
+                            <input type="number" id="input_credit_score" value="710" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Annual Income ($)</label>
+                            <input type="number" id="input_annual_income" value="85000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Debt-to-Income Ratio (%)</label>
+                            <input type="number" step="0.1" id="input_debt_to_income" value="16.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Employment Length (Years)</label>
+                            <input type="number" id="input_employment_length" value="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Loan Amount ($)</label>
+                            <input type="number" id="input_loan_amount" value="18000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Revolving Utilization Ratio</label>
+                            <input type="number" step="0.01" id="input_revolving_util" value="0.28" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Home Ownership</label>
+                            <select id="input_home_ownership" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                                <option value="MORTGAGE" selected>MORTGAGE</option>
+                                <option value="RENT">RENT</option>
+                                <option value="OWN">OWN</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Loan Intent</label>
+                            <select id="input_loan_intent" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+                                <option value="PERSONAL" selected>PERSONAL</option>
+                                <option value="EDUCATION">EDUCATION</option>
+                                <option value="MEDICAL">MEDICAL</option>
+                                <option value="VENTURE">VENTURE</option>
+                                <option value="HOMEIMPROVEMENT">HOMEIMPROVEMENT</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2 pt-2">
+                            <button type="button" onclick="runInference()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm rounded-lg transition shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-play"></i> Run Inference Request
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Prediction Result Box -->
+                    <div id="prediction-result" class="hidden mt-4 p-4 rounded-xl border border-slate-700 bg-slate-900/90 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-400">Prediction Result</span>
+                            <span id="res-risk-badge" class="px-2.5 py-0.5 text-xs font-bold rounded-full">--</span>
+                        </div>
+                        <div class="flex items-baseline gap-4">
+                            <div class="text-2xl font-black text-white" id="res-prob">--%</div>
+                            <div class="text-xs text-slate-400">Default Probability</div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800">
+                            <span id="res-model-ver">Model: --</span>
+                            <span id="res-latency">Latency: -- ms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODEL REGISTRY VIEW -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                    <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-box-archive text-indigo-400"></i> Model Registry Lifecycle
+                    </h2>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-800/80 text-slate-400 uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3">Model ID</th>
+                                    <th class="p-3">Stage</th>
+                                    <th class="p-3">Algorithm</th>
+                                    <th class="p-3">ROC-AUC</th>
+                                    <th class="p-3">Accuracy</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="models-table-body" class="divide-y divide-slate-800 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DATA DRIFT & PSI ANALYSIS -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-yellow-400"></i> Covariate Shift & Drift Analysis
+                        </h2>
+                        <span id="drift-summary-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">NO DRIFT</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-800/80 text-slate-400 uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3">Feature</th>
+                                    <th class="p-3">PSI Score</th>
+                                    <th class="p-3">KS-Test p-value</th>
+                                    <th class="p-3">Wasserstein Dist</th>
+                                    <th class="p-3">Drift Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drift-table-body" class="divide-y divide-slate-800 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT 1 COL: Execution Logs, Experiments, & Charts -->
+            <div class="space-y-8">
+
+                <!-- RETRAINING PIPELINE LIVE CONSOLE LOG -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                    <h2 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-cyan-400"></i> Pipeline Execution Console
+                    </h2>
+                    <div id="pipeline-console" class="h-64 bg-slate-950/90 rounded-xl p-3 font-mono text-[11px] text-emerald-400 overflow-y-auto scroll-custom border border-slate-800 space-y-1">
+                        <div class="text-slate-500">> MLOps Platform System initialized.</div>
+                        <div class="text-slate-500">> Ready for automated training & drift monitoring.</div>
+                    </div>
+                </div>
+
+                <!-- EXPERIMENT TRACKING LOG -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                    <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-flask text-amber-400"></i> Experiment Tracker Runs
+                    </h2>
+                    <div id="experiments-list" class="space-y-3 max-h-72 overflow-y-auto scroll-custom pr-1">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Dashboard JS Logic -->
+    <script>
+        async function fetchDashboardData() {
+            try {
+                // Fetch Registry Models
+                const resModels = await fetch('/registry/models');
+                const dataModels = await resModels.json();
+                renderModelsTable(dataModels.models);
+
+                // Fetch Monitoring Stats
+                const resStats = await fetch('/monitoring/stats');
+                const dataStats = await resStats.json();
+                document.getElementById('stat-latency').innerText = dataStats.avg_latency_ms + ' ms';
+                document.getElementById('stat-total-preds').innerText = dataStats.total_predictions;
+                document.getElementById('stat-default-rate').innerText = 'Default Rate: ' + (dataStats.default_rate * 100).toFixed(1) + '%';
+
+                // Fetch Experiments
+                const resExp = await fetch('/experiments');
+                const dataExp = await resExp.json();
+                renderExperiments(dataExp.runs);
+
+            } catch (err) {
+                console.error("Error loading dashboard data:", err);
+            }
+        }
+
+        function renderModelsTable(models) {
+            const tbody = document.getElementById('models-table-body');
+            tbody.innerHTML = '';
+            
+            let prodFound = false;
+
+            models.forEach(m => {
+                const isProd = m.stage === 'Production';
+                if (isProd) {
+                    prodFound = true;
+                    document.getElementById('stat-prod-model').innerText = m.model_id;
+                    document.getElementById('stat-prod-auc').innerText = 'ROC-AUC: ' + (m.metrics.roc_auc || 0).toFixed(4) + ' | ' + m.model_type;
+                }
+
+                const stageBadge = isProd ? 
+                    '<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">PRODUCTION</span>' :
+                    (m.stage === 'Staging' ? '<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">STAGING</span>' :
+                    '<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-700 text-slate-400">ARCHIVED</span>');
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-white">${m.model_id}</td>
+                    <td class="p-3">${stageBadge}</td>
+                    <td class="p-3 text-slate-300">${m.model_type}</td>
+                    <td class="p-3 font-bold text-emerald-400">${(m.metrics.roc_auc || 0).toFixed(4)}</td>
+                    <td class="p-3">${(m.metrics.accuracy || 0).toFixed(4)}</td>
+                    <td class="p-3">
+                        ${!isProd ? `<button onclick="promoteModel('${m.model_id}')" class="px-2 py-1 bg-brand-600/30 text-brand-400 hover:bg-brand-600 hover:text-white rounded border border-brand-500/30 transition text-[10px]">Promote</button>` : '<span class="text-slate-500 text-[10px]">Active</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderExperiments(runs) {
+            const container = document.getElementById('experiments-list');
+            container.innerHTML = '';
+            if(!runs || runs.length === 0) {
+                container.innerHTML = '<div class="text-xs text-slate-500">No experiments logged yet.</div>';
+                return;
+            }
+
+            runs.slice(0, 5).forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1 text-xs';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-slate-200">${r.run_id}</span>
+                        <span class="text-[10px] text-slate-500">${r.timestamp}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span>Model: <strong class="text-white">${r.model_type}</strong></span>
+                        <span class="text-emerald-400 font-bold">AUC: ${(r.metrics.roc_auc || 0).toFixed(4)}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function runInference() {
+            const body = {
+                credit_score: parseFloat(document.getElementById('input_credit_score').value),
+                annual_income: parseFloat(document.getElementById('input_annual_income').value),
+                debt_to_income: parseFloat(document.getElementById('input_debt_to_income').value),
+                employment_length_years: parseFloat(document.getElementById('input_employment_length').value),
+                loan_amount: parseFloat(document.getElementById('input_loan_amount').value),
+                revolving_utilization: parseFloat(document.getElementById('input_revolving_util').value),
+                home_ownership: document.getElementById('input_home_ownership').value,
+                loan_intent: document.getElementById('input_loan_intent').value
+            };
+
+            const res = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+            
+            const box = document.getElementById('prediction-result');
+            box.classList.remove('hidden');
+            document.getElementById('res-prob').innerText = (data.default_probability * 100).toFixed(1) + '%';
+            document.getElementById('res-model-ver').innerText = 'Model: ' + data.model_version;
+            document.getElementById('res-latency').innerText = 'Latency: ' + data.latency_ms + ' ms';
+            
+            const badge = document.getElementById('res-risk-badge');
+            if (data.risk_level === 'HIGH RISK') {
+                badge.className = 'px-2.5 py-0.5 text-xs font-bold rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30';
+            } else if (data.risk_level === 'MEDIUM RISK') {
+                badge.className = 'px-2.5 py-0.5 text-xs font-bold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            } else {
+                badge.className = 'px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            }
+            badge.innerText = data.risk_level;
+
+            logConsole(`> Executed live prediction request. Risk: ${data.risk_level} (Prob: ${(data.default_probability*100).toFixed(1)}%, Latency: ${data.latency_ms}ms)`);
+            fetchDashboardData();
+        }
+
+        async function triggerDriftSimulation() {
+            logConsole('> Ingesting shifted production dataset to simulate macro-economic drift...');
+            const res = await fetch('/pipeline/simulate-drift?n_samples=1500&inject_drift=true', { method: 'POST' });
+            const data = await res.json();
+            
+            const report = data.drift_report;
+            renderDriftTable(report.feature_reports);
+
+            document.getElementById('stat-psi-val').innerText = report.max_psi + (report.drift_detected ? ' (DRIFT DETECTED)' : ' (STABLE)');
+            document.getElementById('stat-psi-val').className = 'text-xl font-bold ' + (report.drift_detected ? 'text-rose-400' : 'text-emerald-400');
+            
+            const badge = document.getElementById('drift-summary-badge');
+            if (report.drift_detected) {
+                badge.innerText = 'DRIFT DETECTED';
+                badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                logConsole(`[DRIFT ALERT] Max PSI score: ${report.max_psi}. Automatic retraining recommended!`);
+            } else {
+                badge.innerText = 'STABLE';
+                badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            }
+        }
+
+        function renderDriftTable(reports) {
+            const tbody = document.getElementById('drift-table-body');
+            tbody.innerHTML = '';
+
+            for (const [feat, metrics] of Object.entries(reports)) {
+                const isDrift = metrics.drift_detected;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-200">${feat}</td>
+                    <td class="p-3 font-mono ${metrics.psi > 0.20 ? 'text-rose-400 font-bold' : 'text-slate-300'}">${metrics.psi}</td>
+                    <td class="p-3 font-mono text-slate-400">${metrics.ks_p_value}</td>
+                    <td class="p-3 font-mono text-slate-400">${metrics.wasserstein_distance}</td>
+                    <td class="p-3">
+                        ${isDrift ? '<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">DRIFT</span>' : '<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OK</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        async function triggerAutoRetrain() {
+            logConsole('> Triggering Automated Retraining Pipeline flow...');
+            const res = await fetch('/pipeline/auto-retrain', { method: 'POST' });
+            const data = await res.json();
+            
+            const ret = data.retraining_result;
+            ret.logs.forEach(l => logConsole(l));
+
+            fetchDashboardData();
+        }
+
+        async function promoteModel(modelId) {
+            logConsole(`> Promoting model ${modelId} to Production stage...`);
+            await fetch('/registry/promote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model_id: modelId, target_stage: 'Production' })
+            });
+            fetchDashboardData();
+        }
+
+        function logConsole(msg) {
+            const consoleEl = document.getElementById('pipeline-console');
+            const div = document.createElement('div');
+            div.innerText = msg;
+            consoleEl.appendChild(div);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Initial Load
+        fetchDashboardData();
+    </script>
+</body>
+</html>

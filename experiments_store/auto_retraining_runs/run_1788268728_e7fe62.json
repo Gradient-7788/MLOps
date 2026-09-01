@@ -1,0 +1,28 @@
+{
+  "run_id": "run_1788268728_e7fe62",
+  "experiment_name": "auto_retraining_runs",
+  "timestamp": "2026-09-01 18:48:48",
+  "model_type": "GradientBoosting",
+  "params": {},
+  "metrics": {
+    "accuracy": 0.8666666666666667,
+    "roc_auc": 0.845,
+    "precision": 0.75,
+    "recall": 0.9,
+    "f1_score": 0.8181818181818182,
+    "log_loss": 0.538049936931074,
+    "true_negatives": 17,
+    "false_positives": 3,
+    "false_negatives": 1,
+    "true_positives": 9
+  },
+  "dataset_info": {
+    "n_samples": 150,
+    "num_features": 17,
+    "drift_injected": false
+  },
+  "artifacts": {},
+  "tags": {
+    "trigger": "automated_retraining"
+  }
+}

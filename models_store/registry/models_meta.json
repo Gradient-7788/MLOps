@@ -1,0 +1,78 @@
+{
+  "models": [
+    {
+      "model_id": "model_v1",
+      "version": 1,
+      "stage": "Production",
+      "created_at": "2026-09-01 18:48:48",
+      "model_type": "LogisticRegression",
+      "metrics": {
+        "accuracy": 0.82,
+        "roc_auc": 0.8780952380952382,
+        "precision": 0.75,
+        "recall": 0.6,
+        "f1_score": 0.6666666666666666,
+        "log_loss": 0.40696169602854965,
+        "true_negatives": 64,
+        "false_positives": 6,
+        "false_negatives": 12,
+        "true_positives": 18
+      },
+      "params": {},
+      "run_id": "test_run_123",
+      "model_path": "/Users/yeshnavya/Documents/MLOps/models_store/registry/model_v1.pkl",
+      "pipeline_path": "/Users/yeshnavya/Documents/MLOps/models_store/registry/model_v1_pipeline.pkl"
+    },
+    {
+      "model_id": "model_v2",
+      "version": 2,
+      "stage": "Staging",
+      "created_at": "2026-09-01 18:48:48",
+      "model_type": "GradientBoosting",
+      "metrics": {
+        "accuracy": 0.8666666666666667,
+        "roc_auc": 0.845,
+        "precision": 0.75,
+        "recall": 0.9,
+        "f1_score": 0.8181818181818182,
+        "log_loss": 0.538049936931074,
+        "true_negatives": 17,
+        "false_positives": 3,
+        "false_negatives": 1,
+        "true_positives": 9
+      },
+      "params": {},
+      "run_id": "run_1788268728_e7fe62",
+      "model_path": "/Users/yeshnavya/Documents/MLOps/models_store/registry/model_v2.pkl",
+      "pipeline_path": "/Users/yeshnavya/Documents/MLOps/models_store/registry/model_v2_pipeline.pkl"
+    },
+    {
+      "model_id": "model_v3",
+      "version": 3,
+      "stage": "Staging",
+      "created_at": "2026-09-01 18:55:36",
+      "model_type": "GradientBoosting",
+      "metrics": {
+        "accuracy": 0.725,
+        "roc_auc": 0.7437163853240321,
+        "precision": 0.5503875968992248,
+        "recall": 0.398876404494382,
+        "f1_score": 0.46254071661237783,
+        "log_loss": 0.5294855775955859,
+        "true_negatives": 364,
+        "false_positives": 58,
+        "false_negatives": 107,
+        "true_positives": 71
+      },
+      "params": {
+        "n_estimators": 167,
+        "learning_rate": 0.02870592419383491,
+        "max_depth": 4,
+        "subsample": 0.9204692596237912
+      },
+      "run_id": "run_1788269135_5f60aa",
+      "model_path": "/Users/yeshnavya/Documents/MLOps/models_store/registry/model_v3.pkl",
+      "pipeline_path": "/Users/yeshnavya/Documents/MLOps/models_store/registry/model_v3_pipeline.pkl"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  mlops-platform:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data_store:/app/data_store
+      - ./models_store:/app/models_store
+      - ./experiments_store:/app/experiments_store
+      - ./monitoring_store:/app/monitoring_store
+    restart: always
