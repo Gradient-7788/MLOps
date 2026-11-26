@@ -104,3 +104,35 @@ def test_auto_retrainer():
     assert result["status"] == "SUCCESS"
     assert "run_id" in result
     assert len(result["logs"]) > 0
+
+
+def test_no_drift_on_same_distribution():
+    df_ref = generate_synthetic_loan_data(n_samples=3000, random_state=1, inject_drift=False)
+    df_cur = generate_synthetic_loan_data(n_samples=3000, random_state=2, inject_drift=False)
+    report = DriftDetector().detect_drift(df_ref, df_cur)
+    assert report["drift_detected"] is False
+    assert all(r["severity"] == "LOW" for r in report["feature_reports"].values())
+
+
+def test_drift_detected_including_categorical():
+    df_ref = generate_synthetic_loan_data(n_samples=2000, random_state=1, inject_drift=False)
+    df_cur = generate_synthetic_loan_data(n_samples=2000, random_state=2, inject_drift=True)
+    report = DriftDetector().detect_drift(df_ref, df_cur)
+    assert report["drift_detected"] is True
+    assert report["feature_reports"]["credit_score"]["severity"] == "HIGH"
+    assert report["feature_reports"]["home_ownership"]["type"] == "categorical"
+    assert report["feature_reports"]["home_ownership"]["drift_detected"] is True
+
+
+def test_registry_paths_are_portable():
+    registry = ModelRegistry()
+    for m in registry.list_models():
+        assert "/" not in m["model_path"] and "/" not in m["pipeline_path"]
+
+
+def test_auto_model_selection_and_quality_gate():
+    retrainer = AutoRetrainer()
+    result = retrainer.run_pipeline(n_samples=600, model_type="auto", run_hpo=True, n_trials=2)
+    assert result["model_type"] in {"GradientBoosting", "RandomForest", "LogisticRegression"}
+    assert set(result["cv_roc_auc_by_family"]) == {"GradientBoosting", "RandomForest", "LogisticRegression"}
+    assert any("Champion" in l or "No active production model" in l for l in result["logs"])

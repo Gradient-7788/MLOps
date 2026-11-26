@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+# generated at runtime (the API bootstraps a baseline model on first start)
+data_store/
+models_store/
+experiments_store/
+monitoring_store/

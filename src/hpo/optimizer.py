@@ -54,7 +54,7 @@ class HyperparameterOptimizer:
 
             return float(np.mean(scores))
 
-        study = optuna.create_study(direction="maximize")
+        study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=42))
         study.optimize(objective, n_trials=self.n_trials, timeout=self.timeout)
 
         best_params = study.best_params
