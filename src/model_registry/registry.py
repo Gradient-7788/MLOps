@@ -10,6 +10,7 @@ class ModelRegistry:
         self.registry_dir = MODELS_DIR / "registry"
         self.registry_dir.mkdir(parents=True, exist_ok=True)
         self.metadata_file = self.registry_dir / "models_meta.json"
+        self._cache: Dict[str, Tuple[Any, Any]] = {}
         self._init_metadata()
 
     def _init_metadata(self):
@@ -49,14 +50,15 @@ class ModelRegistry:
         record = {
             "model_id": model_id,
             "version": version,
-            "stage": "Staging" if version > 1 else "Production", # Auto set v1 to Production
+            "stage": "Staging" if version > 1 else "Production",  # first model bootstraps Production
             "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "model_type": model_type,
             "metrics": metrics,
             "params": params,
             "run_id": run_id,
-            "model_path": str(model_file),
-            "pipeline_path": str(pipeline_file)
+            # stored relative to the registry dir so the registry is portable across machines
+            "model_path": model_file.name,
+            "pipeline_path": pipeline_file.name
         }
 
         # If this is set to Production, archive old production models
@@ -109,13 +111,24 @@ class ModelRegistry:
             else:
                 raise RuntimeError("No models registered in Model Registry.")
 
-        with open(prod_meta["model_path"], "rb") as f:
-            model_obj = pickle.load(f)
+        return self._load(prod_meta)
 
-        from src.feature_pipeline.pipeline import FeaturePipeline
-        pipeline_obj = FeaturePipeline.load(prod_meta["pipeline_path"])
+    def _resolve(self, path: str) -> Path:
+        p = Path(path)
+        return p if p.is_absolute() and p.exists() else self.registry_dir / p.name
 
-        return model_obj, pipeline_obj, prod_meta
+    def _load(self, meta: Dict[str, Any]) -> Tuple[Any, Any, Dict[str, Any]]:
+        """Unpickle a registered model + feature pipeline, cached by model_id so serving does not
+        hit the disk on every request."""
+        mid = meta["model_id"]
+        if mid not in self._cache:
+            with open(self._resolve(meta["model_path"]), "rb") as f:
+                model_obj = pickle.load(f)
+            from src.feature_pipeline.pipeline import FeaturePipeline
+            pipeline_obj = FeaturePipeline.load(str(self._resolve(meta["pipeline_path"])))
+            self._cache[mid] = (model_obj, pipeline_obj)
+        model_obj, pipeline_obj = self._cache[mid]
+        return model_obj, pipeline_obj, meta
 
     def list_models(self) -> List[Dict[str, Any]]:
         meta = self._read_metadata()

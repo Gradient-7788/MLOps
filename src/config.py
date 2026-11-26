@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# MLOPS_HOME lets tests and deployments keep artifacts outside the source tree
+BASE_DIR = Path(os.environ.get("MLOPS_HOME", Path(__file__).resolve().parent.parent))
 DATA_DIR = BASE_DIR / "data_store"
 MODELS_DIR = BASE_DIR / "models_store"
 EXPERIMENTS_DIR = BASE_DIR / "experiments_store"
@@ -40,3 +41,5 @@ VALIDATION_RULES = {
 # Drift Thresholds
 DRIFT_PSI_THRESHOLD = 0.20
 DRIFT_KS_PVALUE_THRESHOLD = 0.05
+DRIFT_KS_STAT_THRESHOLD = 0.10   # KS effect size: with large samples p-values alone flag trivial shifts
+DRIFT_CHI2_PVALUE_THRESHOLD = 0.01

@@ -63,7 +63,7 @@ class LoanPredictionInput(BaseModel):
 class RetrainRequest(BaseModel):
     n_samples: int = Field(default=2500, ge=500, le=20000)
     inject_drift: bool = Field(default=False)
-    model_type: str = Field(default="GradientBoosting")
+    model_type: str = Field(default="GradientBoosting", description="GradientBoosting | RandomForest | LogisticRegression | auto")
     run_hpo: bool = Field(default=True)
 
 class PromoteRequest(BaseModel):
@@ -82,7 +82,7 @@ def health_check():
 
 @app.post("/predict")
 def predict_single(input_data: LoanPredictionInput):
-    start_time = time.time()
+    start_time = time.perf_counter()
     try:
         model, pipeline, meta = registry.get_production_model()
     except Exception as e:
@@ -97,7 +97,7 @@ def predict_single(input_data: LoanPredictionInput):
     prediction = int(model.predict(X_trans)[0])
     probability = float(model.predict_proba(X_trans)[0][1])
     
-    latency_ms = (time.time() - start_time) * 1000.0
+    latency_ms = (time.perf_counter() - start_time) * 1000.0
     
     # Log prediction to monitoring store
     monitor.log_prediction(
@@ -158,13 +158,13 @@ def trigger_auto_retrain():
     except Exception:
         drift_report = {"drift_detected": True, "max_psi": 0.35}
 
-    # Trigger automatic retraining
-    retrain_result = retrainer.run_pipeline(
-        n_samples=3000,
-        inject_drift=False, # Train on clean adapted dataset
-        model_type="GradientBoosting",
-        run_hpo=True
-    )
+    # Retrain on the RECENT data window (reference + latest production batch), so the new model
+    # learns the shifted distribution instead of the one it was already trained on.
+    try:
+        recent = pd.concat([load_dataset("latest_train.csv"), load_dataset("latest_prod_batch.csv")], ignore_index=True)
+    except Exception:
+        recent = None
+    retrain_result = retrainer.run_pipeline(df=recent, n_samples=3000, model_type="auto", run_hpo=True)
     
     return {
         "drift_cause": drift_report.get("summary", "Manual trigger"),

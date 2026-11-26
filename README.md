@@ -1056,3 +1056,27 @@ Machine Learning • AI • MLOps • Quantitative Engineering
 ## 📄 License
 
 This project is intended as an educational and engineering portfolio project demonstrating production-oriented machine learning system design.
+
+---
+
+## 📏 Measured results & design notes
+
+End-to-end run through the FastAPI app (`TestClient`, 3,000 synthetic loans, Optuna 10 trials per family):
+
+| Step | Result |
+| --- | --- |
+| Auto model selection (CV ROC-AUC, stratified 3-fold) | LogisticRegression 0.752 · GradientBoosting 0.740 · RandomForest 0.737 → LogisticRegression selected |
+| Hold-out ROC-AUC (stratified 20%) | 0.748 |
+| `/predict` latency over 300 requests (model cached in memory) | mean 3.5 ms · p95 4.8 ms |
+| Drift check, stable batch vs reference | no alert · max PSI 0.016 |
+| Drift check, "recession" batch | alert · PSI HIGH on all 6 numeric features (0.31–3.89) and `loan_intent` (0.52) |
+| Auto-retrain on reference + recent batch | challenger 0.867 vs champion 0.868 on the same validation split → kept as Staging |
+
+Design decisions:
+
+- **No leakage:** the stratified train/validation split happens before the `FeaturePipeline` is fitted; Optuna's CV runs on the training split only.
+- **Train–serving consistency:** the fitted `ColumnTransformer` is pickled with each model version and loaded together.
+- **Champion vs challenger:** a new model is promoted only if its ROC-AUC on the *same* validation split is ≥ the production model's.
+- **Drift rule:** a numeric feature drifts if PSI > 0.20, or the KS test is significant (p < 0.05) *and* the KS statistic D > 0.10 (effect-size guard against large-sample false alarms). Categorical features use category-share PSI and a chi-square test. Severity tiers use the credit-scorecard PSI convention (< 0.10 low, 0.10–0.25 medium, > 0.25 high). Wasserstein distance is reported in raw units and in reference standard deviations.
+- **Portable registry:** artifact paths are stored relative to the registry directory; `MLOPS_HOME` relocates all artifacts (the tests use a temp dir).
+- **Known limits:** only data drift is detected (concept drift needs delayed labels); the file-based registry and JSON experiment tracker stand in for MLflow; the API has no authentication; pickles must come from a trusted registry.
